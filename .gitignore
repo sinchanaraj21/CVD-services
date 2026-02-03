@@ -1,0 +1,16 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+
+# React
+node_modules/
+build/
+
+# Spring Boot
+target/
+*.log
+
+# OS
+.DS_Store
+

@@ -1,0 +1,43 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: cvd-postgres
+    environment:
+      POSTGRES_DB: cvd
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  cvd-ml:
+    build:
+      context: ./local/xgboost
+    container_name: cvd-ml
+    ports:
+      - "5001:5001"
+
+  cvd-backend:
+    build:
+      context: /Users/sinchanaraj/IdeaProjects/springboot
+    container_name: cvd-backend
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    depends_on:
+      - postgres
+      - cvd-ml
+
+  cvd-frontend:
+    build:
+      context: ./local/frontend
+    container_name: cvd-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - cvd-backend
+
+volumes:
+  postgres_data:
