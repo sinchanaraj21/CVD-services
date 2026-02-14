@@ -151,20 +151,21 @@ async def predict(
         disease_class_index = list(model.classes_).index(1)
         probability = model.predict_proba(input_data)[0][disease_class_index]
         prediction = int(probability >= 0.5)
-        risk_percentage = float(probability * 100)
+        risk_percentage = round(float(probability * 100), 2)  # Round to 2 decimals
         risk_category = categorize_risk(probability)
         
+        # Get SHAP values
         shap_exp = explainer(input_data)
 
         if isinstance(shap_exp.values, list):
             shap_vals = shap_exp.values[1][0]
         else:
-             shap_vals = shap_exp.values[0]
+            shap_vals = shap_exp.values[0]
 
         
-        # Create feature contribution dictionary
+        # Create feature contribution dictionary - ROUNDED TO 3 DECIMALS
         shap_dict = {
-            feature: float(value) 
+            feature: round(float(value), 3)  # Round to 3 decimal places
             for feature, value in zip(feature_names, shap_vals)
         }
         
@@ -172,11 +173,11 @@ async def predict(
         feature_contributions = [
             {
                 "feature": feature,
-                "shap_value": float(value),
+                "shap_value": round(float(value), 3),  # Round to 3 decimals
                 "actual_value": float(input_data[feature].values[0]),
                 "contribution": "increases risk" if value > 0 else "decreases risk"
             }
-            for feature, value in shap_dict.items()
+            for feature, value in zip(feature_names, shap_vals)
         ]
         
         # Sort by absolute SHAP value
@@ -187,7 +188,7 @@ async def predict(
         )[:5]  # Top 5 factors
         
         return PredictionResponse(
-            risk_probability=float(probability),
+            risk_probability=round(float(probability), 3),  # Round to 3 decimals
             risk_category=risk_category,
             risk_percentage=risk_percentage,
             shap_values=shap_dict,

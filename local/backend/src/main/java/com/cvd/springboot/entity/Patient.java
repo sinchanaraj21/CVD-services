@@ -2,20 +2,25 @@ package com.cvd.springboot.entity;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
 @Table(name = "patients")
 public class Patient {
-
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    private String name;
-    private String email;
-
+    @Column(name = "sl_no")
+    private Long slNo;
+    
+    @Column(name = "patient_id", unique = true, nullable = false)
+    private String patientId;  // CVD0001, CVD0002, etc. - Links to PatientLogin
+    
+    @Column(name = "created_at")
+    private LocalDateTime createdAt = LocalDateTime.now();
+    
+    // Medical data fields
     private Integer age;
     private Integer sex;
     private Integer cp;
@@ -29,16 +34,21 @@ public class Patient {
     private Integer slope;
     private Integer ca;
     private Integer thal;
-
+    
     @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL)
     @JsonManagedReference
     private List<Prediction> predictions;
-
+    
+    // Optional: Reference to PatientLogin for convenience
+    @ManyToOne
+    @JoinColumn(name = "patient_id", referencedColumnName = "patient_id", 
+                insertable = false, updatable = false)
+    private PatientLogin patientLogin;
+    
     // ===== GETTERS =====
-
-    public Long getId() { return id; }
-    public String getName() { return name; }
-    public String getEmail() { return email; }
+    public Long getSlNo() { return slNo; }
+    public String getPatientId() { return patientId; }
+    public LocalDateTime getCreatedAt() { return createdAt; }
     public Integer getAge() { return age; }
     public Integer getSex() { return sex; }
     public Integer getCp() { return cp; }
@@ -53,12 +63,12 @@ public class Patient {
     public Integer getCa() { return ca; }
     public Integer getThal() { return thal; }
     public List<Prediction> getPredictions() { return predictions; }
-
+    public PatientLogin getPatientLogin() { return patientLogin; }
+    
     // ===== SETTERS =====
-
-    public void setId(Long id) { this.id = id; }
-    public void setName(String name) { this.name = name; }
-    public void setEmail(String email) { this.email = email; }
+    public void setSlNo(Long slNo) { this.slNo = slNo; }
+    public void setPatientId(String patientId) { this.patientId = patientId; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
     public void setAge(Integer age) { this.age = age; }
     public void setSex(Integer sex) { this.sex = sex; }
     public void setCp(Integer cp) { this.cp = cp; }
@@ -73,4 +83,5 @@ public class Patient {
     public void setCa(Integer ca) { this.ca = ca; }
     public void setThal(Integer thal) { this.thal = thal; }
     public void setPredictions(List<Prediction> predictions) { this.predictions = predictions; }
+    public void setPatientLogin(PatientLogin patientLogin) { this.patientLogin = patientLogin; }
 }
