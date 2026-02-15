@@ -20,25 +20,25 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http
-            // Disable CSRF for API usage
             .csrf(csrf -> csrf.disable())
 
-            // Authorization rules
             .authorizeHttpRequests(auth -> auth
-                // Auth endpoints open
+
+                // ── Fully public ──────────────────────────────────
                 .requestMatchers("/api/auth/**").permitAll()
-
-                // Allow patient creation without auth (current logic)
-                .requestMatchers(HttpMethod.POST, "/api/patients").permitAll()
-
-                // Allow predictions (fix for 403)
                 .requestMatchers("/api/predictions/**").permitAll()
+                .requestMatchers(HttpMethod.POST,   "/api/patients").permitAll()
+                .requestMatchers(HttpMethod.GET,    "/api/patients/phone/**").permitAll()
+                .requestMatchers(HttpMethod.GET,    "/api/patients/{patientId}").permitAll()
+                .requestMatchers(HttpMethod.PUT,    "/api/patients/**").permitAll()
 
-                // Everything else requires authentication
+                // ── Admin routes — require valid JWT ──────────────
+                .requestMatchers("/api/patients/admin/**").authenticated()
+
+                // ── Everything else — require auth ────────────────
                 .anyRequest().authenticated()
             )
 
-            // Add JWT filter before default auth filter
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
