@@ -26,7 +26,7 @@ public class JwtFilter extends OncePerRequestFilter {
         System.out.println("🔍 JWT Filter - Path: " + path);
         
         // Skip filter for these paths
-        boolean skip = path.startsWith("/api/auth") || 
+        boolean skip = path.startsWith("/api/auth") ||
                        path.startsWith("/api/patients") ||
                        path.startsWith("/api/predictions");
         

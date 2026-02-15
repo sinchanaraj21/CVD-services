@@ -1,15 +1,6 @@
 package com.cvd.springboot.repository;
 
-import com.cvd.springboot.entity.ShapValues;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
-
-import java.util.Optional;
-
-@Repository
-public interface ShapValuesRepository extends JpaRepository<ShapValues, Long> {
-    
-    Optional<ShapValues> findByPredictionSlNo(Long predictionSlNo);
-    
-    Optional<ShapValues> findByPatientId(String patientId);
-}
+// This file is intentionally empty.
+// ShapValuesRepository is no longer needed — SHAP values are stored
+// directly in the predictions table via the Prediction entity.
+// See: PredictionController.java and Prediction.java
