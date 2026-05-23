@@ -20,29 +20,32 @@ import java.util.Map;
 @RequestMapping("/api/predictions")
 public class PredictionController {
 
-    private final PatientRepository patientRepository;
+    private final PatientRepository    patientRepository;
     private final PredictionRepository predictionRepository;
-    private final MlClientService mlClientService;
+    private final MlClientService      mlClientService;
 
-    public PredictionController(
-            PatientRepository patientRepository,
-            PredictionRepository predictionRepository,
-            MlClientService mlClientService
-    ) {
-        this.patientRepository = patientRepository;
+    public PredictionController(PatientRepository patientRepository,
+                                PredictionRepository predictionRepository,
+                                MlClientService mlClientService) {
+        this.patientRepository    = patientRepository;
         this.predictionRepository = predictionRepository;
-        this.mlClientService = mlClientService;
+        this.mlClientService      = mlClientService;
     }
 
+    // ════════════════════════════════════════════════
+    // POST /api/predictions/{patientId}
+    // Run the ML model and save the prediction.
+    // Doctor-review creation removed — doctor role no longer exists.
+    // ════════════════════════════════════════════════
     @PostMapping("/{patientId}")
     @Transactional
     public ResponseEntity<?> createPrediction(@PathVariable String patientId) {
 
         Patient patient = patientRepository.findByPatientId(patientId)
-            .orElseThrow(() -> new RuntimeException(
-                "Patient medical record not found with id: " + patientId));
+                .orElseThrow(() -> new RuntimeException(
+                        "Patient medical record not found with id: " + patientId));
 
-        MlPredictionRequest mlRequest = buildMlRequest(patient);
+        MlPredictionRequest  mlRequest  = buildMlRequest(patient);
         MlPredictionResponse mlResponse = mlClientService.getPrediction(mlRequest);
 
         Map<String, Double> shap = mlResponse.getShapValues();
@@ -71,17 +74,18 @@ public class PredictionController {
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 
+    // ════════════════════════════════════════════════
+    // GET /api/predictions/patient/{patientId}
+    // ════════════════════════════════════════════════
     @GetMapping("/patient/{patientId}")
     public ResponseEntity<?> getPatientPredictions(@PathVariable String patientId) {
         return ResponseEntity.ok(
-            predictionRepository.findByPatientIdOrderByPredictedAtDesc(patientId)
-        );
+                predictionRepository.findByPatientIdOrderByPredictedAtDesc(patientId));
     }
 
-    /**
-     * DELETE /api/predictions/admin/{slNo}
-     * Admin: delete a single prediction row by its sl_no
-     */
+    // ════════════════════════════════════════════════
+    // DELETE /api/predictions/admin/{slNo}
+    // ════════════════════════════════════════════════
     @DeleteMapping("/admin/{slNo}")
     @Transactional
     public ResponseEntity<?> deletePrediction(@PathVariable Long slNo) {
@@ -93,6 +97,7 @@ public class PredictionController {
         return ResponseEntity.ok(Map.of("message", "Prediction " + slNo + " deleted successfully"));
     }
 
+    // ─── helper ──────────────────────────────────────
     private MlPredictionRequest buildMlRequest(Patient patient) {
         MlPredictionRequest req = new MlPredictionRequest();
         req.setAge(patient.getAge());

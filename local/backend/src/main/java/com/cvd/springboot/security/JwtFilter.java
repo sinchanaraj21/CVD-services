@@ -7,29 +7,31 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import javax.crypto.SecretKey;
-import io.jsonwebtoken.security.Keys;
+
 import java.io.IOException;
 
 @Component
 public class JwtFilter extends OncePerRequestFilter {
 
-    private final SecretKey key = Keys.hmacShaKeyFor(
-        "cvd_secret_key_for_jwt_token_generation_123456".getBytes()
-    );
+    private final JwtUtil jwtUtil;
+
+    public JwtFilter(JwtUtil jwtUtil) {
+        this.jwtUtil = jwtUtil;
+    }
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path   = request.getRequestURI();
         String method = request.getMethod();
 
-        // Public – no token needed
-        if (path.startsWith("/api/auth"))               return true;  // login / OTP
-        if (path.startsWith("/api/predictions"))        return true;  // patient predictions
-        if ("POST".equals(method) && path.equals("/api/patients")) return true; // patient create
+        if (path.startsWith("/api/auth"))       return true;
+        if (path.startsWith("/api/researcher")) return true;
 
-        // Admin routes MUST go through the filter so we can validate the JWT
-        // Everything else also goes through the filter
+        // Patient self-service — only specific safe operations bypass auth
+        if ("POST".equals(method) && path.equals("/api/patients")) return true;
+        if ("GET".equals(method)  && path.startsWith("/api/patients/phone/")) return true;
+
+        // Everything else (including /api/predictions and /api/patients admin routes) requires JWT
         return false;
     }
 
@@ -52,11 +54,10 @@ public class JwtFilter extends OncePerRequestFilter {
 
         try {
             Jwts.parserBuilder()
-                .setSigningKey(key)
+                .setSigningKey(jwtUtil.getKey())
                 .build()
                 .parseClaimsJws(token);
 
-            // Token valid — set a simple authentication so Spring Security is satisfied
             org.springframework.security.core.context.SecurityContextHolder.getContext()
                 .setAuthentication(
                     new org.springframework.security.authentication.UsernamePasswordAuthenticationToken(

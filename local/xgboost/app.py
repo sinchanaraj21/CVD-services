@@ -13,6 +13,7 @@ import pandas as pd
 import shap
 from typing import List, Dict, Optional, Any
 import uvicorn
+import os
 
 # Initialize FastAPI app
 app = FastAPI(
@@ -21,8 +22,8 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# API Key configuration
-API_KEY = "cvd_ml_internal_key_2024"  # In production, use environment variable
+# API Key — read from environment variable. Fallback is for local dev only.
+API_KEY = os.environ.get("CVD_ML_API_KEY", "cvd_ml_internal_key_2024")
 api_key_header = APIKeyHeader(name="X-API-KEY", auto_error=True)
 
 # Global variables for model and explainer
@@ -224,7 +225,6 @@ async def batch_predict(
 if __name__ == "__main__":
     print("Starting CVD Prediction Service...")
     print("Service will be available at http://localhost:5001")
-    print(f"Required header: X-API-KEY: {API_KEY}")
     
     uvicorn.run(
         app,

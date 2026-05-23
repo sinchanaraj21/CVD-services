@@ -18,27 +18,30 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-
         http
             .csrf(csrf -> csrf.disable())
-
             .authorizeHttpRequests(auth -> auth
 
-                // ── Fully public ──────────────────────────────────
+                // ── Fully public (auth endpoints) ─────────────────
                 .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers("/api/predictions/**").permitAll()
-                .requestMatchers(HttpMethod.POST,   "/api/patients").permitAll()
-                .requestMatchers(HttpMethod.GET,    "/api/patients/phone/**").permitAll()
-                .requestMatchers(HttpMethod.GET,    "/api/patients/{patientId}").permitAll()
-                .requestMatchers(HttpMethod.PUT,    "/api/patients/**").permitAll()
 
-                // ── Admin routes — require valid JWT ──────────────
-                .requestMatchers("/api/patients/admin/**").authenticated()
+                // ── Researcher dashboard — intentionally public ───
+                .requestMatchers("/api/researcher/**").permitAll()
 
-                // ── Everything else — require auth ────────────────
+                // ── Patient self-registration & lookup ────────────
+                // POST /api/patients  — create account (pre-login)
+                .requestMatchers(HttpMethod.POST, "/api/patients").permitAll()
+                // GET  /api/patients/phone/** — fetch own record by phone (pre-login)
+                .requestMatchers(HttpMethod.GET,  "/api/patients/phone/**").permitAll()
+
+                // ── Everything else requires a valid JWT ──────────
+                // This covers:
+                //   /api/predictions/**   — run/view/delete predictions
+                //   /api/patients/**      — admin patient management, PUT updates
+                //   /api/admin/**         — admin management
+                //   /api/doctors/**       — doctor routes
                 .anyRequest().authenticated()
             )
-
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

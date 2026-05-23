@@ -2,6 +2,7 @@ package com.cvd.springboot.service;
 
 import com.cvd.springboot.dto.MlPredictionRequest;
 import com.cvd.springboot.dto.MlPredictionResponse;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -9,6 +10,9 @@ import org.springframework.web.reactive.function.client.WebClient;
 public class MlClientService {
 
     private final WebClient webClient;
+
+    @Value("${ml.api.key}")
+    private String mlApiKey;
 
     public MlClientService(WebClient webClient) {
         this.webClient = webClient;
@@ -18,7 +22,7 @@ public class MlClientService {
 
         return webClient.post()
                 .uri("/predict")
-                .header("X-API-KEY", "cvd_ml_internal_key_2024")
+                .header("X-API-KEY", mlApiKey)
                 .bodyValue(request)
                 .retrieve()
                 .bodyToMono(MlPredictionResponse.class)
