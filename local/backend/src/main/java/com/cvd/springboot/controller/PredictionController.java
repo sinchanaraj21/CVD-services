@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.Map;
 
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = {"http://localhost:3000", "https://sinchanaraj21.github.io"})
 @RestController
 @RequestMapping("/api/predictions")
 public class PredictionController {

@@ -21,7 +21,7 @@ import java.util.Optional;
  */
 @RestController
 @RequestMapping("/api/admin")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = {"http://localhost:3000", "https://sinchanaraj21.github.io"})
 public class AdminController {
 
     // Super-admin is permanently protected — can never be deleted

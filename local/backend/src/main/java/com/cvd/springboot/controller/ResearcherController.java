@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/researcher")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = {"http://localhost:3000", "https://sinchanaraj21.github.io"})
 public class ResearcherController {
 
     private final PatientLoginRepository patientLoginRepository;
