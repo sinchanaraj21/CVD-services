@@ -71,8 +71,8 @@ Trained on the [UCI Heart Disease dataset](https://archive.ics.uci.edu/dataset/4
 ### 1. Clone the repo
 
 ```bash
-git clone https://github.com/<your-username>/cvd.git
-cd cvd
+git clone https://github.com/sinchanaraj21/CVD-services.git
+cd CVD-services
 ```
 
 ### 2. Set environment variables
