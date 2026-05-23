@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/CVD-services/static/css/main.d6db92bf.css",
+    "main.js": "/CVD-services/static/js/main.ef90b026.js",
+    "static/js/453.20359781.chunk.js": "/CVD-services/static/js/453.20359781.chunk.js",
+    "index.html": "/CVD-services/index.html",
+    "main.d6db92bf.css.map": "/CVD-services/static/css/main.d6db92bf.css.map",
+    "main.ef90b026.js.map": "/CVD-services/static/js/main.ef90b026.js.map",
+    "453.20359781.chunk.js.map": "/CVD-services/static/js/453.20359781.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.d6db92bf.css",
+    "static/js/main.ef90b026.js"
+  ]
+}
